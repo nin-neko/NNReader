@@ -38,8 +38,8 @@ namespace NNReader
         {
             base.ConfigureModuleCatalog(moduleCatalog);
 
-            moduleCatalog.AddModule<Core.CoreModule>();
-            moduleCatalog.AddModule<Shells.ShellModule>(dependsOn: nameof(Core.CoreModule));
+            moduleCatalog.AddModule<CoreModule>();
+            moduleCatalog.AddModule<Shells.ShellModule>(dependsOn: nameof(CoreModule));
         }
 
         protected override void InitializeModules()

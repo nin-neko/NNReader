@@ -7,7 +7,7 @@
     <ProjectGuid>{88B5AB1C-9339-49C8-84AF-A5D94EE62795}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NNReader.Interfaces</RootNamespace>
+    <RootNamespace>NNReader</RootNamespace>
     <AssemblyName>NNReader.Interfaces</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -42,8 +42,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="Bookmarks\IBookmarkService.cs" />
+    <Compile Include="Bookmarks\IBookmarkInfo.cs" />
+    <Compile Include="Menu.cs" />
+    <Compile Include="Ordering\IOrderDispatcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NNReader.Interfaces
+
+namespace NNReader
 {
-    public class Class1
+    public enum Menu
     {
+        Home,
+        Bookmarks,
     }
 }
