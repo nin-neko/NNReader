@@ -5,10 +5,16 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:prism="http://prismlibrary.com/"
+             xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
              prism:ViewModelLocator.AutoWireViewModel="True"
              d:DesignHeight="450"
              Width="300">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <toolkit:InverseBoolConverter x:Key="InverseBoolConverter"/>
+    </UserControl.Resources>
     
     <Grid>
         <Grid.RowDefinitions>
@@ -24,12 +30,56 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Orientation="Horizontal">
-                <Button
+                <toolkit:DropDownButton
+                    Width="100"
+                    Height="40"
+                    DataContext="{Binding NewNovelViewModel, Mode=OneTime}"
+                    IsOpen="{Binding IsOpen.Value, Mode=TwoWay}"
                     Content="Add New">
+                    <toolkit:DropDownButton.DropDownContent>
+                        <Border>
+                            <StackPanel Margin="5">
+                                <TextBlock
+                                    Margin="5"
+                                    FontWeight="Bold"
+                                    FontSize="15"
+                                    Text="Add new novel"/>
+                                <StackPanel
+                                    Margin="5"
+                                    Orientation="Horizontal">
+                                    <TextBlock Text="N Code: "/>
+                                    <TextBox
+                                        Width="200"
+                                        IsEnabled="{Binding Downloading.Value, Mode=OneWay, Converter={StaticResource InverseBoolConverter}}"
+                                        Text="{Binding Ncode.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
 
-                </Button>
+                                <Button
+                                    Margin="5"
+                                    Padding="0"
+                                    Height="30"
+                                    HorizontalContentAlignment="Stretch"
+                                    VerticalContentAlignment="Stretch"
+                                    Command="{Binding DownloadCommand, Mode=OneTime}">
+                                    <Grid>
+                                        <ProgressBar
+                                            BorderThickness="0"
+                                            Background="Transparent"
+                                            Visibility="{Binding Downloading.Value, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                            IsIndeterminate="{Binding Downloading.Value, Mode=OneWay}"/>
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Text="Download"/>
+                                    </Grid>
+                                </Button>
+                            </StackPanel>
+                        </Border>
+                    </toolkit:DropDownButton.DropDownContent>
+                </toolkit:DropDownButton>
 
                 <Button
+                    Width="100"
                     Content="Update All">
 
                 </Button>
@@ -39,11 +89,13 @@
         <ListBox
             Grid.Row="1"
             ItemsSource="{Binding BookmarkInfos, Mode=OneWay}">
+            
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <prism:InvokeCommandAction Command="{Binding SelectionChangedCommand, Mode=OneTime}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
+            
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>

@@ -23,7 +23,11 @@ namespace NNReader
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterSingleton<IOrderDispatcher, OrderDispatcher>();
-            containerRegistry.Register<IOrder, ChangingSelectionOrder>(nameof(ChangingSelectionOrder));
+            containerRegistry.RegisterSingleton<IOrderBuilder, OrderBuilder>();
+
+            containerRegistry.Register<IOrder, ChangingSelection>(nameof(ChangingSelection));
+            containerRegistry.Register<IOrder, ChangingNovelSelection>(nameof(ChangingNovelSelection));
+            containerRegistry.Register<IOrder, DownloadingBookmarkInfo>(nameof(DownloadingBookmarkInfo));
 
             containerRegistry.RegisterSingleton<INarouBookmarkService, NarouBookmarkService>();
             containerRegistry.RegisterSingleton<NarouBookmarkService>();

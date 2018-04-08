@@ -18,16 +18,16 @@ using NNReader.Ordering;
 
 namespace NNReader.Bookmarks
 {
-    class ChangingSelectionOrder : BaseOrder
+    class ChangingNovelSelection : BaseOrder
     {
         public static readonly string IdContext = nameof(IdContext);
 
-        public override void Invoke()
+        public override async Task InvokeAsync()
         {
             var id = (Guid)this.Contexts[IdContext];
             var bookmarkService = this.Container.Resolve<NarouBookmarkService>();
 
-            bookmarkService.SelectedBookmarkId = id;
+            bookmarkService.ChangeNovelSelection(id);
         }
     }
 }

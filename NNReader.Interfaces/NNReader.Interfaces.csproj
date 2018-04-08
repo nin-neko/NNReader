@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bookmarks\INovel.cs" />
     <Compile Include="Bookmarks\IBookmarkService.cs" />
     <Compile Include="Bookmarks\IBookmarkInfo.cs" />
     <Compile Include="Menu.cs" />

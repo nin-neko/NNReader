@@ -21,6 +21,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <LangVersion>latest</LangVersion>
+    <NoWarn>1998</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -30,8 +31,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <LangVersion>latest</LangVersion>
+    <NoWarn>1998</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AngleSharp, Version=0.9.9.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
+      <HintPath>..\packages\AngleSharp.0.9.9.2\lib\net45\AngleSharp.dll</HintPath>
+    </Reference>
     <Reference Include="CommonServiceLocator, Version=2.0.3.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
       <HintPath>..\packages\CommonServiceLocator.2.0.3\lib\net47\CommonServiceLocator.dll</HintPath>
     </Reference>
@@ -69,10 +74,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bookmarks\ChangingNovelSelection.cs" />
+    <Compile Include="Bookmarks\DownloadingBookmarkInfo.cs" />
+    <Compile Include="Bookmarks\Novel.cs" />
     <Compile Include="Bookmarks\BookmarkInfo.cs" />
-    <Compile Include="Bookmarks\ChangingSelectionOrder.cs" />
+    <Compile Include="Bookmarks\ChangingSelection.cs" />
     <Compile Include="Bookmarks\BookmarkService.cs" />
     <Compile Include="CoreModule.cs" />
+    <Compile Include="Ordering\OrderBuilder.cs" />
     <Compile Include="Ordering\OrderDispatcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

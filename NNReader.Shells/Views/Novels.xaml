@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:prism="http://prismlibrary.com/"
              mc:Ignorable="d" 
              prism:ViewModelLocator.AutoWireViewModel="True"
@@ -28,11 +29,27 @@
             VerticalAlignment="Center"
             Text="Empty"/>
 
-        <ListBox Width="200">
+        <ListBox
+            Width="200"
+            Visibility="{Binding IsAnySelected.Value, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+            ItemsSource="{Binding Novels, Mode=OneWay}">
+
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <prism:InvokeCommandAction Command="{Binding SelectionChangedCommand, Mode=OneTime}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
             
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Title, Mode=OneTime}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
         </ListBox>
 
         <TextBlock
-            Grid.Column="1"/>
+            Grid.Column="1"
+            Visibility="{Binding IsAnySelected.Value, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+            Text="{Binding NovelContent.Value, Mode=OneWay}"/>
     </Grid>
 </UserControl>
