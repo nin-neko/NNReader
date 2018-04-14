@@ -52,8 +52,8 @@ namespace NNReader.Shells.ViewModels
     {
         public NewNovelViewModel(IContainerProvider container, IOrderBuilder orderBuilder, INarouBookmarkService bookmarkService)
         {
-            this.DownloadCommand = bookmarkService.ObserveProperty(x => x.Downloading)
-                .Select(x => !x)
+            this.DownloadCommand = bookmarkService.ObserveProperty(x => x.Status)
+                .Select(x => x != BookmarkServiceStatus.BookmarkInfoDownloading && x != BookmarkServiceStatus.BookmarkInfoLoading)
                 .ObserveOnUIDispatcher()
                 .ToAsyncReactiveCommand()
                 .WithSubscribe(async () =>
@@ -63,12 +63,13 @@ namespace NNReader.Shells.ViewModels
                         .DispatchAsync();
                 });
 
-            this.Downloading = bookmarkService.ObserveProperty(x => x.Downloading)
+            this.Downloading = bookmarkService.ObserveProperty(x => x.Status)
+                .Select(x => x == BookmarkServiceStatus.BookmarkInfoDownloading)
                 .ObserveOnUIDispatcher()
                 .ToReadOnlyReactivePropertySlim();
 
             var downloaded = Observable.FromEventPattern(h => bookmarkService.Downloaded += h, h => bookmarkService.Downloaded -= h);
-            var failed = Observable.FromEventPattern(h => bookmarkService.Failed += h, h => bookmarkService.Failed -= h);
+            var failed = Observable.FromEventPattern(h => bookmarkService.DownloadingFailed += h, h => bookmarkService.DownloadingFailed -= h);
 
             new[] { downloaded, failed }
                 .Merge()

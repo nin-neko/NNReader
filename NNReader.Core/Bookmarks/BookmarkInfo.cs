@@ -10,100 +10,146 @@ using Prism.Mvvm;
 
 namespace NNReader.Bookmarks
 {
-    class BookmarkInfo : BindableBase, IBookmarkInfo
+    abstract class BookmarkInfo : BindableBase, IBookmarkInfo
     {
-        private readonly ObservableCollection<INovel> novels = new ObservableCollection<INovel>();
+        private readonly ObservableCollection<IChapter> novels = new ObservableCollection<IChapter>();
 
-        protected BookmarkInfo(Guid id, string ncode, string title, string author)
+        protected BookmarkInfo(Guid id, string ncode)
         {
             this.Id = id;
             this.Ncode = ncode;
-            this.Title = title;
-            this.Author = author;
-            this.BookmarkedDate = DateTime.Now;
+            this.Title = "";
+            this.Writer = "";
+            this.BookmarkedDate = DateTimeOffset.Now;
+            this.Status = BookmarkInfoStatus.Created;
 
-            this.Novels = new ReadOnlyObservableCollection<INovel>(this.novels);
+            this.Chapters = new ReadOnlyObservableCollection<IChapter>(this.novels);
         }
 
         public Guid Id { get; }
         public string Ncode { get; }
-        public string Title { get; }
-        public string Author { get; }
-        public DateTime BookmarkedDate { get; }
 
-        public ReadOnlyObservableCollection<INovel> Novels { get; }
-
-        protected void Add(INovel novel) => novels.Add(novel);
-        protected NarouNovel Add(string title)
+        private string title;
+        public string Title
         {
-            var nextIndex = this.Novels.Count;
-            var novel = new NarouNovel(this.Ncode, nextIndex, title);
-            this.Add(novel);
-            return novel;
+            get => title;
+            protected set => this.SetProperty(ref title, value);
         }
+
+        private string writer;
+        public string Writer
+        {
+            get => writer;
+            protected set => this.SetProperty(ref writer, value);
+        }
+
+        private DateTimeOffset bookmarkedDate;
+        public DateTimeOffset BookmarkedDate
+        {
+            get => bookmarkedDate;
+            protected set => this.SetProperty(ref bookmarkedDate, value);
+        }
+
+        private BookmarkInfoStatus status;
+        public BookmarkInfoStatus Status
+        {
+            get => status;
+            protected set => this.SetProperty(ref status, value);
+        }
+
+        public ReadOnlyObservableCollection<IChapter> Chapters { get; }
+
+        protected void Add(IChapter novel) => novels.Add(novel);
     }
 
-    class NarouBookmarkInfo : BookmarkInfo
+    abstract class BaseLoadableBookmarkInfo : BookmarkInfo, ILoadableBookmarkInfo
     {
-        public NarouBookmarkInfo(Guid id, string ncode, string title, string author)
-            : base(id, ncode, title, author)
+        protected BaseLoadableBookmarkInfo(Guid id, string ncode)
+            : base(id, ncode)
         {
         }
 
-        public NarouBookmarkInfo(string ncode, string title, string author)
-            : this(Guid.NewGuid(), ncode, title, author)
+        public abstract Task<bool> IsSummaryLoadableAsync();
+        public abstract Task<bool> IsChapterLoadableAsync();
+
+        protected virtual async Task OnSummaryLoadedAsync() { }
+        protected abstract Task DoSummaryLoading();
+
+        public async Task LoadSummaryAsync()
         {
-        }
-
-        public bool Loaded { get; private set; }
-
-        private bool downloading;
-        public bool Downloading
-        {
-            get => downloading;
-            private set => this.SetProperty(ref downloading, value);
-        }
-
-        public async Task DownloadAsync()
-        {
-            this.Loaded = false;
-            this.Downloading = true;
-
-            var url = $"{Narou.BASE_URL}{this.Ncode.ToLower()}/";
+            this.Status = BookmarkInfoStatus.SummaryLoading;
             try
             {
-                var narou = new Narou();
-                var text = await narou.ReceiveAsync(url);
-                var parser = new AngleSharp.Parser.Html.HtmlParser();
-                using (var html = await parser.ParseAsync(text))
-                {
-                    foreach (var e in html.QuerySelectorAll("dd > a"))
-                    {
-                        var novel = this.Add(e.TextContent);
-                        //await novel.Download();
-                    }
-                }
-                this.Loaded = true;
+                await this.DoSummaryLoading();
+                this.Status = BookmarkInfoStatus.SummaryLoaded;
+                await this.OnSummaryLoadedAsync();
+                this.SummaryLoaded?.Invoke(this, EventArgs.Empty);
             }
             finally
             {
-                this.Downloading = false;
             }
         }
 
-        public async Task DownloadAllNovelContentAsync()
-        {
-            this.Downloading = true;
+        protected virtual async Task OnSummaryDownloadedAsync() { }
+        protected abstract Task DoSummaryDownloading();
 
+        public async Task DownloadSummaryAsync()
+        {
+            this.Status = BookmarkInfoStatus.SummaryDownloading;
             try
             {
-                var tasks = this.Novels.Cast<NarouNovel>().Select(x => x.DownloadAsync()).ToArray();
-                await Task.WhenAll(tasks);
+                await this.DoSummaryDownloading();
+                this.Status = BookmarkInfoStatus.SummaryLoaded;
+                await this.OnSummaryDownloadedAsync();
+                this.SummaryDownloaded?.Invoke(this, EventArgs.Empty);
             }
             finally
             {
-                this.Downloading = false;
             }
         }
+
+        protected virtual async Task OnChapterLoadedAsync() { }
+        protected abstract Task DoChapterLoading();
+
+        public async Task LoadChapterAsync()
+        {
+            this.Status = BookmarkInfoStatus.ChapterLoading;
+            try
+            {
+                await this.DoChapterLoading();
+                this.Status = BookmarkInfoStatus.ChapterLoaded;
+                await this.OnChapterLoadedAsync();
+                this.ChapterLoaded?.Invoke(this, EventArgs.Empty);
+            }
+            finally
+            {
+                
+            }
+        }
+
+        protected virtual async Task OnChapterDownloadedAsync() { }
+        protected abstract Task DoChapterDownloading();
+
+        public async Task DownloadChapterAsync()
+        {
+            this.Status = BookmarkInfoStatus.ChapterDownloading;
+            try
+            {
+                await this.DoChapterDownloading();
+                this.Status = BookmarkInfoStatus.ChapterLoaded;
+                await this.OnChapterDownloadedAsync();
+                this.ChapterDownloaded?.Invoke(this, EventArgs.Empty);
+            }
+            finally
+            {
+
+            }
+        }
+
+        public event EventHandler SummaryLoaded;
+        public event EventHandler SummaryDownloaded;
+
+        public event EventHandler ChapterLoaded;
+        public event EventHandler ChapterDownloaded;
     }
 }

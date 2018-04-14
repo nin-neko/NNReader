@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net.Http;
+using System.IO;
 using System.IO.Compression;
 
 using Newtonsoft.Json;
@@ -16,15 +17,16 @@ using Prism.Mvvm;
 
 namespace NNReader.Bookmarks
 {
-    class BookmarkService : BindableBase, IBookmarkService
+    abstract class BookmarkService : BindableBase, IBookmarkService
     {
         private readonly ObservableCollection<IBookmarkInfo> bookmarks = new ObservableCollection<IBookmarkInfo>();
-        private readonly ObservableCollection<INovel> novels = new ObservableCollection<INovel>();
+        private readonly ObservableCollection<IChapter> chapters = new ObservableCollection<IChapter>();
 
-        public BookmarkService()
+        protected BookmarkService()
         {
             this.Bookmarks = new ReadOnlyObservableCollection<IBookmarkInfo>(this.bookmarks);
-            this.Novels = new ReadOnlyObservableCollection<INovel>(this.novels);
+            this.Chapters = new ReadOnlyObservableCollection<IChapter>(this.chapters);
+            this.Status = BookmarkServiceStatus.Created;
         }
 
         public ReadOnlyObservableCollection<IBookmarkInfo> Bookmarks { get; }
@@ -36,7 +38,7 @@ namespace NNReader.Bookmarks
             private set => this.SetProperty(ref selectedBookmarkId, value);
         }
 
-        public ReadOnlyObservableCollection<INovel> Novels { get; }
+        public ReadOnlyObservableCollection<IChapter> Chapters { get; }
 
         private Guid selectedNovelId;
         public Guid SelectedNovelId
@@ -45,14 +47,14 @@ namespace NNReader.Bookmarks
             private set => this.SetProperty(ref selectedNovelId, value);
         }
 
-        protected void Add(IBookmarkInfo bookmarkInfo) => bookmarks.Add(bookmarkInfo);
-
-        protected NarouBookmarkInfo Add(string ncode, string title, string author)
+        private BookmarkServiceStatus status;
+        public BookmarkServiceStatus Status
         {
-            var bookmark = new NarouBookmarkInfo(ncode, title, author);
-            this.Add(bookmark);
-            return bookmark;
+            get => status;
+            protected set => this.SetProperty(ref status, value);
         }
+
+        protected void Add(IBookmarkInfo bookmarkInfo) => bookmarks.Add(bookmarkInfo);
 
         protected virtual void OnChangingBookmarkSelection(IBookmarkInfo lastBookmarkInfo, IBookmarkInfo nextBookmarkInfo)
         {
@@ -66,7 +68,7 @@ namespace NNReader.Bookmarks
         {
             if (this.SelectedBookmarkId == id) return;
 
-            var nextBookmark = this.Bookmarks.Single(x => x.Id == id);
+            var nextBookmark = this.Bookmarks.SingleOrDefault(x => x.Id == id);
             var lastBookmarkInfo = this.Bookmarks.SingleOrDefault(x => x.Id == this.SelectedBookmarkId);
 
             this.OnChangingBookmarkSelection(lastBookmarkInfo, nextBookmark);
@@ -74,176 +76,66 @@ namespace NNReader.Bookmarks
             void OnAddChanged(object sender, NotifyCollectionChangedEventArgs e)
             {
                 if (e.Action != NotifyCollectionChangedAction.Add) return;
-                foreach (var x in e.NewItems.Cast<INovel>())
+                foreach (var x in e.NewItems.Cast<IChapter>())
                 {
-                    novels.Add(x);
+                    chapters.Add(x);
                 }
             }
 
             void OnRemoveChanged(object sender, NotifyCollectionChangedEventArgs e)
             {
                 if (e.Action != NotifyCollectionChangedAction.Remove) return;
-                foreach (var x in e.OldItems.Cast<INovel>())
+                foreach (var x in e.OldItems.Cast<IChapter>())
                 {
-                    novels.Remove(x);
+                    chapters.Remove(x);
                 }
             }
 
             void OnClearChanged(object sender, NotifyCollectionChangedEventArgs e)
             {
                 if (e.Action != NotifyCollectionChangedAction.Reset) return;
-                novels.Clear();
+                chapters.Clear();
             }
 
             this.SelectedNovelId = Guid.Empty;
-            ((INotifyCollectionChanged)nextBookmark.Novels).CollectionChanged -= OnAddChanged;
-            ((INotifyCollectionChanged)nextBookmark.Novels).CollectionChanged -= OnRemoveChanged;
-            ((INotifyCollectionChanged)nextBookmark.Novels).CollectionChanged -= OnClearChanged;
-            novels.Clear();
+            if (lastBookmarkInfo != null)
+            {
+                ((INotifyCollectionChanged)lastBookmarkInfo.Chapters).CollectionChanged -= OnAddChanged;
+                ((INotifyCollectionChanged)lastBookmarkInfo.Chapters).CollectionChanged -= OnRemoveChanged;
+                ((INotifyCollectionChanged)lastBookmarkInfo.Chapters).CollectionChanged -= OnClearChanged;
+            }
+            chapters.Clear();
 
             this.SelectedBookmarkId = id;
-            ((INotifyCollectionChanged)nextBookmark.Novels).CollectionChanged += OnAddChanged;
-            ((INotifyCollectionChanged)nextBookmark.Novels).CollectionChanged += OnRemoveChanged;
-            ((INotifyCollectionChanged)nextBookmark.Novels).CollectionChanged += OnClearChanged;
-            novels.AddRange(nextBookmark.Novels);
+            if (nextBookmark != null)
+            {
+                ((INotifyCollectionChanged)nextBookmark.Chapters).CollectionChanged += OnAddChanged;
+                ((INotifyCollectionChanged)nextBookmark.Chapters).CollectionChanged += OnRemoveChanged;
+                ((INotifyCollectionChanged)nextBookmark.Chapters).CollectionChanged += OnClearChanged;
+                chapters.AddRange(nextBookmark.Chapters);
+            }
 
             this.OnChangedBookmarkSelection(lastBookmarkInfo, nextBookmark);
         }
 
-        public void ChangeNovelSelection(Guid id)
+        protected virtual void OnChangingChapterSelection(IChapter lastNovel, IChapter nextNovel)
         {
+        }
+
+        protected virtual void OnChangedChapterSelection(IChapter lastNovel, IChapter nextNovel)
+        {
+        }
+
+        public void ChangeChapterSelection(Guid id)
+        {
+            if (this.SelectedNovelId == id) return;
+
+            var lastNovel = this.Chapters.SingleOrDefault(x => x.Id == this.SelectedNovelId);
+            var nextNovel = this.Chapters.SingleOrDefault(x => x.Id == id);
+
+            this.OnChangingChapterSelection(lastNovel, nextNovel);
             this.SelectedNovelId = id;
-        }
-    }
-
-    class NarouBookmarkService : BookmarkService, INarouBookmarkService
-    {
-        public NarouBookmarkService()
-        {
-        }
-
-        public bool Loaded { get; private set; }
-
-        private bool downloading;
-        public bool Downloading
-        {
-            get => downloading;
-            private set => this.SetProperty(ref downloading, value);
-        }
-
-        protected override void OnChangedBookmarkSelection(IBookmarkInfo lastBookmarkInfo, IBookmarkInfo nextBookmarkInfo)
-        {
-            if (nextBookmarkInfo != null && nextBookmarkInfo is NarouBookmarkInfo bookmarkInfo)
-            {
-                Task.Run(async () => await bookmarkInfo.DownloadAsync());
-            }
-        }
-
-        public async Task DownloadAsync(string ncode)
-        {
-            this.Loaded = false;
-            this.Downloading = true;
-
-            var url = $"{Narou.BASE_API_URL}&ncode={ncode.ToLower()}";
-            try
-            {
-                var narou = new Narou();
-                var jtoken = await narou.ReceiveJTokenAsync(url);
-
-                var targetJTokens = jtoken.Where(x =>
-                {
-                    var ncodeToken = x["ncode"];
-                    if (ncodeToken == null) return false;
-                    return ncodeToken.ToString().ToLower() == ncode;
-                })
-                .ToArray();
-
-                if (!targetJTokens.Any() || targetJTokens.Length > 1) return;
-
-                var targetJToken = targetJTokens[0];
-
-                var title = targetJToken["title"]?.ToString() ?? "";
-                var author = targetJToken["writer"]?.ToString() ?? "";
-                var c = targetJToken["ncode"]?.ToString() ?? "";
-
-                var bookmark = this.Add(c, title, author);
-                this.Loaded = true;
-
-                this.Downloaded?.Invoke(this, EventArgs.Empty);
-            }
-            catch (Exception)
-            {
-                this.Failed?.Invoke(this, EventArgs.Empty);
-            }
-            finally
-            {
-                this.Downloading = false;
-            }
-        }
-
-        public event EventHandler Downloaded;
-        public event EventHandler Failed;
-    }
-
-    class Narou : BindableBase
-    {
-        public static readonly string BASE_API_URL = "https://api.syosetu.com/novelapi/api/?out=json&gzip=5";
-        public static readonly string BASE_URL = "https://ncode.syosetu.com/";
-        private static readonly UTF8Encoding encoding = new UTF8Encoding(false);
-        private static readonly HttpClient httpApiClient = new HttpClient();
-        private static readonly HttpClient httpTextClient = new HttpClient();
-
-        public Narou()
-        {
-
-        }
-
-        private bool downloading;
-        public bool Downloading
-        {
-            get => downloading;
-            private set => this.SetProperty(ref downloading, value);
-        }
-
-        private async Task<byte[]> ReceiveBytesAsync(string url)
-        {
-            using (var stream = await httpApiClient.GetStreamAsync(url))
-            using (var gzipStream = new GZipStream(stream, CompressionMode.Decompress))
-            {
-                var receivedBytes = new List<byte>();
-                var buffer = new byte[1024];
-                while (true)
-                {
-                    var actual = await gzipStream.ReadAsync(buffer, 0, buffer.Length);
-                    if (actual == 0) break;
-                    if (actual == buffer.Length)
-                    {
-                        receivedBytes.AddRange(buffer);
-                    }
-                    else
-                    {
-                        receivedBytes.AddRange(buffer.Take(actual));
-                    }
-                }
-                return receivedBytes.ToArray();
-            }
-        }
-
-        private async Task<string> ReceiveJsonAsync(string url)
-        {
-            var bin = await this.ReceiveBytesAsync(url);
-            return encoding.GetString(bin);
-        }
-
-        public async Task<JArray> ReceiveJTokenAsync(string url)
-        {
-            var json = await this.ReceiveJsonAsync(url);
-            return (JArray)JToken.Parse(json);
-        }
-
-        public async Task<string> ReceiveAsync(string url)
-        {
-            return await httpTextClient.GetStringAsync(url);
+            this.OnChangedChapterSelection(lastNovel, nextNovel);
         }
     }
 }

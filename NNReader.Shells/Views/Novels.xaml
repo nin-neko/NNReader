@@ -32,7 +32,8 @@
         <ListBox
             Width="200"
             Visibility="{Binding IsAnySelected.Value, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-            ItemsSource="{Binding Novels, Mode=OneWay}">
+            HorizontalContentAlignment="Stretch"
+            ItemsSource="{Binding Chapters, Mode=OneWay}">
 
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
@@ -42,14 +43,27 @@
             
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Title, Mode=OneTime}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding Title.Value, Mode=OneWay}"/>
+                        <TextBlock
+                            Grid.Column="2"
+                            Text="{Binding Status.Value, Mode=OneWay}"/>
+                    </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <TextBlock
+        <ScrollViewer
             Grid.Column="1"
-            Visibility="{Binding IsAnySelected.Value, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-            Text="{Binding NovelContent.Value, Mode=OneWay}"/>
+            Visibility="{Binding IsAnySelected.Value, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <TextBlock
+                Text="{Binding NovelContent.Value, Mode=OneWay}"/>
+        </ScrollViewer>
+        
     </Grid>
 </UserControl>

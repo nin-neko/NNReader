@@ -27,7 +27,7 @@ namespace NNReader.Bookmarks
             var id = (Guid)this.Contexts[IdContext];
             var bookmarkService = this.Container.Resolve<NarouBookmarkService>();
 
-            bookmarkService.ChangeNovelSelection(id);
+            bookmarkService.ChangeChapterSelection(id);
         }
     }
 }

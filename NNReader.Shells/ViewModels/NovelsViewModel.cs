@@ -31,24 +31,26 @@ namespace NNReader.Shells.ViewModels
                 .ObserveOnUIDispatcher()
                 .ToReadOnlyReactivePropertySlim();
 
-            this.Novels = bookmarkService.Novels.ToReadOnlyReactiveCollection(scheduler: UIDispatcherScheduler.Default);
+            this.Chapters = bookmarkService.Chapters.ToReadOnlyReactiveCollection(x => new ChapterViewModel(x), scheduler: UIDispatcherScheduler.Default);
 
+            IDisposable contentSubscribing = default;
             bookmarkService.ObserveProperty(x => x.SelectedNovelId)
-                .Select(x =>
-                {
-                    if (x == Guid.Empty) return "";
-                    var selected = bookmarkService.Novels.Single(n => n.Id == x);
-                    return selected.Content;
-                })
                 .ObserveOnUIDispatcher()
                 .Subscribe(x =>
                 {
-                    this.NovelContent.Value = x;
+                    contentSubscribing?.Dispose();
+                    if (x == Guid.Empty) return;
+
+                    var selected = bookmarkService.Chapters.Single(n => n.Id == x);
+
+                    contentSubscribing = selected.ObserveProperty(xx => xx.Content)
+                        .ObserveOnUIDispatcher()
+                        .Subscribe(xx => this.NovelContent.Value = xx);
                 });
 
             this.SelectionChangedCommand.Subscribe(async e =>
             {
-                var selectred = e.AddedItems.Cast<INovel>().FirstOrDefault();
+                var selectred = e.AddedItems.Cast<ChapterViewModel>().FirstOrDefault();
                 await orderBuilder.From("ChangingNovelSelection")
                     .With("Id", selectred?.Id ?? Guid.Empty)
                     .DispatchAsync();
@@ -58,9 +60,37 @@ namespace NNReader.Shells.ViewModels
         public ReadOnlyReactivePropertySlim<bool> IsEmpty { get; }
         public ReadOnlyReactivePropertySlim<bool> IsAnySelected { get; }
 
-        public ReadOnlyReactiveCollection<INovel> Novels { get; }
+        public ReadOnlyReactiveCollection<ChapterViewModel> Chapters { get; }
         public AsyncReactiveCommand<SelectionChangedEventArgs> SelectionChangedCommand { get; } = new AsyncReactiveCommand<SelectionChangedEventArgs>();
 
         public ReactivePropertySlim<string> NovelContent { get; } = new ReactivePropertySlim<string>("");
+    }
+
+    class ChapterViewModel : IDisposable
+    {
+        private readonly System.Reactive.Disposables.CompositeDisposable disposables = new System.Reactive.Disposables.CompositeDisposable();
+
+        public ChapterViewModel(IChapter chapter)
+        {
+            this.Id = chapter.Id;
+
+            this.Title = chapter.ObserveProperty(x => x.Title)
+                .ObserveOnUIDispatcher()
+                .ToReadOnlyReactivePropertySlim()
+                .AddTo(disposables);
+
+            this.Status = chapter.ObserveProperty(x => x.Status)
+                .Select(x => x.ToString())
+                .ObserveOnUIDispatcher()
+                .ToReadOnlyReactivePropertySlim()
+                .AddTo(disposables);
+        }
+
+        public Guid Id { get; }
+
+        public ReadOnlyReactivePropertySlim<string> Title { get; }
+        public ReadOnlyReactivePropertySlim<string> Status { get; }
+
+        public void Dispose() => disposables.Dispose();
     }
 }

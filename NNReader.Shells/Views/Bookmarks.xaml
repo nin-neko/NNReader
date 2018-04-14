@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:prism="http://prismlibrary.com/"
-             xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
              prism:ViewModelLocator.AutoWireViewModel="True"
              d:DesignHeight="450"
@@ -13,7 +13,6 @@
 
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-        <toolkit:InverseBoolConverter x:Key="InverseBoolConverter"/>
     </UserControl.Resources>
     
     <Grid>
@@ -30,7 +29,9 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Orientation="Horizontal">
-                <toolkit:DropDownButton
+                <materialDesign:PopupBox>
+                </materialDesign:PopupBox>
+                <!--<toolkit:DropDownButton
                     Width="100"
                     Height="40"
                     DataContext="{Binding NewNovelViewModel, Mode=OneTime}"
@@ -76,7 +77,7 @@
                             </StackPanel>
                         </Border>
                     </toolkit:DropDownButton.DropDownContent>
-                </toolkit:DropDownButton>
+                </toolkit:DropDownButton>-->
 
                 <Button
                     Width="100"
@@ -102,9 +103,9 @@
                         <TextBlock>
                             <Run
                                 FontSize="20"
-                                Text="{Binding Title, Mode=OneTime}"/>
+                                Text="{Binding Title, Mode=OneWay}"/>
                             <LineBreak/>
-                            <Run Text="{Binding Author, Mode=OneTime}"/>
+                            <Run Text="{Binding Writer, Mode=OneWay}"/>
                         </TextBlock>
                     </Grid>
                 </DataTemplate>

@@ -22,6 +22,9 @@ namespace NNReader
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            containerRegistry.RegisterInstance(IO.Locator.Default);
+            containerRegistry.RegisterInstance<IO.ILocator>(IO.Locator.Default);
+
             containerRegistry.RegisterSingleton<IOrderDispatcher, OrderDispatcher>();
             containerRegistry.RegisterSingleton<IOrderBuilder, OrderBuilder>();
 

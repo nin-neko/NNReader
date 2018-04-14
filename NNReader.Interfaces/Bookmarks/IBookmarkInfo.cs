@@ -14,9 +14,28 @@ namespace NNReader.Bookmarks
         Guid Id { get; }
         string Ncode { get; }
         string Title { get; }
-        string Author { get; }
-        DateTime BookmarkedDate { get; }
+        string Writer { get; }
+        DateTimeOffset BookmarkedDate { get; }
+        BookmarkInfoStatus Status { get; }
 
-        ReadOnlyObservableCollection<INovel> Novels { get; }
+        ReadOnlyObservableCollection<IChapter> Chapters { get; }
+    }
+
+    public interface ILoadableBookmarkInfo : IBookmarkInfo
+    {
+        Task<bool> IsSummaryLoadableAsync();
+        Task<bool> IsChapterLoadableAsync();
+
+        Task LoadSummaryAsync();
+        Task DownloadSummaryAsync();
+
+        Task LoadChapterAsync();
+        Task DownloadChapterAsync();
+
+        event EventHandler SummaryLoaded;
+        event EventHandler SummaryDownloaded;
+
+        event EventHandler ChapterLoaded;
+        event EventHandler ChapterDownloaded;
     }
 }

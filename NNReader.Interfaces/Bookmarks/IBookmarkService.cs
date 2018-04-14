@@ -15,18 +15,20 @@ namespace NNReader.Bookmarks
 
         Guid SelectedBookmarkId { get; }
 
-        ReadOnlyObservableCollection<INovel> Novels { get; }
+        ReadOnlyObservableCollection<IChapter> Chapters { get; }
 
         Guid SelectedNovelId { get; }
+
+        BookmarkServiceStatus Status { get; }
     }
 
     public interface INarouBookmarkService : IBookmarkService
     {
-        bool Downloading { get; }
-
+        Task LoadAsync();
         Task DownloadAsync(string ncode);
-
+        
+        event EventHandler Loaded;
         event EventHandler Downloaded;
-        event EventHandler Failed;
+        event EventHandler DownloadingFailed;
     }
 }
