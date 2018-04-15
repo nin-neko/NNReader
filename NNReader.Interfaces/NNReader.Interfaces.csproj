@@ -46,12 +46,15 @@
     <Compile Include="Bookmarks\IChapter.cs" />
     <Compile Include="Bookmarks\IBookmarkService.cs" />
     <Compile Include="Bookmarks\IBookmarkInfo.cs" />
+    <Compile Include="Diagnostics\IComponent.cs" />
+    <Compile Include="Diagnostics\IComponentService.cs" />
     <Compile Include="IO\ILocator.cs" />
     <Compile Include="Menu.cs" />
     <Compile Include="Ordering\IOrderDispatcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialization\IDeserializer.cs" />
     <Compile Include="Serialization\ISerializer.cs" />
+    <Compile Include="Shells\IDialogService.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

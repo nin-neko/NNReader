@@ -15,6 +15,7 @@ using MaterialDesignThemes.Wpf.Transitions;
 
 using NNReader.Bookmarks;
 using NNReader.Ordering;
+using NNReader.Shells.ViewModels.HomeContents;
 
 
 namespace NNReader.Shells.ViewModels
