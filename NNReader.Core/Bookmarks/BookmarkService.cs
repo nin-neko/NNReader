@@ -17,35 +17,17 @@ using Prism.Mvvm;
 
 namespace NNReader.Bookmarks
 {
-    abstract class BookmarkService : BindableBase, IBookmarkService
+    abstract class BaseBookmarkService : BindableBase, IBookmarkService
     {
-        private readonly ObservableCollection<IBookmarkInfo> bookmarks = new ObservableCollection<IBookmarkInfo>();
-        private readonly ObservableCollection<IChapter> chapters = new ObservableCollection<IChapter>();
+        private readonly ObservableCollection<ILoadableBookmarkInfo> bookmarks = new ObservableCollection<ILoadableBookmarkInfo>();
 
-        protected BookmarkService()
+        protected BaseBookmarkService()
         {
-            this.Bookmarks = new ReadOnlyObservableCollection<IBookmarkInfo>(this.bookmarks);
-            this.Chapters = new ReadOnlyObservableCollection<IChapter>(this.chapters);
+            this.Bookmarks = new ReadOnlyObservableCollection<ILoadableBookmarkInfo>(this.bookmarks);
             this.Status = BookmarkServiceStatus.Created;
         }
 
-        public ReadOnlyObservableCollection<IBookmarkInfo> Bookmarks { get; }
-
-        private Guid selectedBookmarkId;
-        public Guid SelectedBookmarkId
-        {
-            get => selectedBookmarkId;
-            private set => this.SetProperty(ref selectedBookmarkId, value);
-        }
-
-        public ReadOnlyObservableCollection<IChapter> Chapters { get; }
-
-        private Guid selectedNovelId;
-        public Guid SelectedNovelId
-        {
-            get => selectedNovelId;
-            private set => this.SetProperty(ref selectedNovelId, value);
-        }
+        public ReadOnlyObservableCollection<ILoadableBookmarkInfo> Bookmarks { get; }
 
         private BookmarkServiceStatus status;
         public BookmarkServiceStatus Status
@@ -54,88 +36,93 @@ namespace NNReader.Bookmarks
             protected set => this.SetProperty(ref status, value);
         }
 
-        protected void Add(IBookmarkInfo bookmarkInfo) => bookmarks.Add(bookmarkInfo);
+        protected void Add(ILoadableBookmarkInfo bookmarkInfo) => bookmarks.Add(bookmarkInfo);
 
-        protected virtual void OnChangingBookmarkSelection(IBookmarkInfo lastBookmarkInfo, IBookmarkInfo nextBookmarkInfo)
+        public void RequestBookmark(IBookmarkInfo bookmarkInfo) => this.BookmarkRequested?.Invoke(this, new BookmarkRequestEventArgs(bookmarkInfo));
+
+        public void RequestBookmark(Guid bookmarkInfoId)
         {
-        }
-
-        protected virtual void OnChangedBookmarkSelection(IBookmarkInfo lastBookmarkInfo, IBookmarkInfo nextBookmarkInfo)
-        {
-        }
-
-        public void ChangeBookmarkSelection(Guid id)
-        {
-            if (this.SelectedBookmarkId == id) return;
-
-            var nextBookmark = this.Bookmarks.SingleOrDefault(x => x.Id == id);
-            var lastBookmarkInfo = this.Bookmarks.SingleOrDefault(x => x.Id == this.SelectedBookmarkId);
-
-            this.OnChangingBookmarkSelection(lastBookmarkInfo, nextBookmark);
-
-            void OnAddChanged(object sender, NotifyCollectionChangedEventArgs e)
+            if (bookmarkInfoId == Guid.Empty)
             {
-                if (e.Action != NotifyCollectionChangedAction.Add) return;
-                foreach (var x in e.NewItems.Cast<IChapter>())
-                {
-                    chapters.Add(x);
-                }
+                this.RequestBookmark(null);
+                return;
             }
-
-            void OnRemoveChanged(object sender, NotifyCollectionChangedEventArgs e)
-            {
-                if (e.Action != NotifyCollectionChangedAction.Remove) return;
-                foreach (var x in e.OldItems.Cast<IChapter>())
-                {
-                    chapters.Remove(x);
-                }
-            }
-
-            void OnClearChanged(object sender, NotifyCollectionChangedEventArgs e)
-            {
-                if (e.Action != NotifyCollectionChangedAction.Reset) return;
-                chapters.Clear();
-            }
-
-            this.SelectedNovelId = Guid.Empty;
-            if (lastBookmarkInfo != null)
-            {
-                ((INotifyCollectionChanged)lastBookmarkInfo.Chapters).CollectionChanged -= OnAddChanged;
-                ((INotifyCollectionChanged)lastBookmarkInfo.Chapters).CollectionChanged -= OnRemoveChanged;
-                ((INotifyCollectionChanged)lastBookmarkInfo.Chapters).CollectionChanged -= OnClearChanged;
-            }
-            chapters.Clear();
-
-            this.SelectedBookmarkId = id;
-            if (nextBookmark != null)
-            {
-                ((INotifyCollectionChanged)nextBookmark.Chapters).CollectionChanged += OnAddChanged;
-                ((INotifyCollectionChanged)nextBookmark.Chapters).CollectionChanged += OnRemoveChanged;
-                ((INotifyCollectionChanged)nextBookmark.Chapters).CollectionChanged += OnClearChanged;
-                chapters.AddRange(nextBookmark.Chapters);
-            }
-
-            this.OnChangedBookmarkSelection(lastBookmarkInfo, nextBookmark);
+            var requested = this.Bookmarks.Single(x => x.Id == bookmarkInfoId);
+            this.RequestBookmark(requested);
         }
 
-        protected virtual void OnChangingChapterSelection(IChapter lastNovel, IChapter nextNovel)
+        public void RequestChapter(IChapter chapter) => this.ChapterRequested?.Invoke(this, new ChapterRequestEventArgs(chapter));
+
+        public void RequestChapter(Guid chapterId)
+        {
+            if (chapterId == Guid.Empty)
+            {
+                this.RequestChapter(null);
+                return;
+            }
+            var requested = this.Bookmarks.SelectMany(x => x.Chapters).Single(x => x.Id == chapterId);
+            this.RequestChapter(requested);
+        }
+
+        public event EventHandler<BookmarkRequestEventArgs> BookmarkRequested;
+        public event EventHandler<ChapterRequestEventArgs> ChapterRequested;
+    }
+
+    abstract class BaseLoadableBookmarkService : BaseBookmarkService, ILoadableBookmarkService
+    {
+        public BaseLoadableBookmarkService()
         {
         }
 
-        protected virtual void OnChangedChapterSelection(IChapter lastNovel, IChapter nextNovel)
+        public abstract Task<bool> IsLoadableAsync();
+
+        protected virtual async Task OnLoadedAsync() { }
+        protected abstract Task DoLoadingAsync();
+
+        public async Task LoadAsync()
         {
+            this.Status = BookmarkServiceStatus.BookmarkInfoLoading;
+            try
+            {
+                await this.DoLoadingAsync();
+                this.Status = BookmarkServiceStatus.Loaded;
+                await this.OnLoadedAsync();
+                this.Loaded?.Invoke(this, EventArgs.Empty);
+            }
+            catch
+            {
+                this.LoadingFailed?.Invoke(this, EventArgs.Empty);
+            }
+            finally
+            {
+            }
         }
 
-        public void ChangeChapterSelection(Guid id)
+        protected virtual async Task OnDownloadedAsync(string ncode) { }
+        protected abstract Task DoDownloadingAsync(string ncode);
+
+        public async Task DownloadAsync(string ncode)
         {
-            if (this.SelectedNovelId == id) return;
-
-            var lastNovel = this.Chapters.SingleOrDefault(x => x.Id == this.SelectedNovelId);
-            var nextNovel = this.Chapters.SingleOrDefault(x => x.Id == id);
-
-            this.OnChangingChapterSelection(lastNovel, nextNovel);
-            this.SelectedNovelId = id;
-            this.OnChangedChapterSelection(lastNovel, nextNovel);
+            this.Status = BookmarkServiceStatus.BookmarkInfoDownloading;
+            try
+            {
+                await this.DoDownloadingAsync(ncode);
+                this.Status = BookmarkServiceStatus.Loaded;
+                await this.OnDownloadedAsync(ncode);
+                this.Downloaded?.Invoke(this, EventArgs.Empty);
+            }
+            catch
+            {
+                this.DownloadingFailed?.Invoke(this, EventArgs.Empty);
+            }
+            finally
+            {
+            }
         }
+
+        public event EventHandler Loaded;
+        public event EventHandler LoadingFailed;
+        public event EventHandler Downloaded;
+        public event EventHandler DownloadingFailed;
     }
 }

@@ -74,22 +74,34 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bookmarks\LoadingChapterContent.cs" />
+    <Compile Include="Bookmarks\LoadingChapterTitle.cs" />
+    <Compile Include="Bookmarks\LoadingBookmarkChapter.cs" />
     <Compile Include="Bookmarks\NarouBookmarkService.cs" />
-    <Compile Include="Bookmarks\NarouClient.cs" />
+    <Compile Include="Net\NarouUrlBuilder.cs" />
+    <Compile Include="Net\NarouClient.cs" />
+    <Compile Include="Net\BaseNarouClient.cs" />
     <Compile Include="Bookmarks\NarouBookmarkInfo.cs" />
-    <Compile Include="Bookmarks\ChangingNovelSelection.cs" />
     <Compile Include="Bookmarks\NarouChapter.cs" />
     <Compile Include="Bookmarks\DownloadingBookmarkInfo.cs" />
     <Compile Include="Bookmarks\Chapter.cs" />
     <Compile Include="Bookmarks\BookmarkInfo.cs" />
-    <Compile Include="Bookmarks\ChangingSelection.cs" />
+    <Compile Include="Bookmarks\LoadingBookmarkService.cs" />
+    <Compile Include="Bookmarks\LoadingBookmarkSummary.cs" />
+    <Compile Include="Bookmarks\RequestingChapter.cs" />
+    <Compile Include="Bookmarks\RequestingBookmark.cs" />
     <Compile Include="Bookmarks\BookmarkService.cs" />
     <Compile Include="CoreModule.cs" />
+    <Compile Include="Debugging\MoqBookmarkService.cs" />
+    <Compile Include="Debugging\MoqBookmarkInfo.cs" />
+    <Compile Include="Debugging\MoqChapter.cs" />
     <Compile Include="IO\Locator.cs" />
     <Compile Include="Ordering\OrderBuilder.cs" />
     <Compile Include="Ordering\OrderDispatcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Serialization\ChapterSerializer.cs" />
     <Compile Include="Serialization\Deserializer.cs" />
+    <Compile Include="Serialization\BookmarkInfoSerializer.cs" />
     <Compile Include="Serialization\Serializer.cs" />
   </ItemGroup>
   <ItemGroup>

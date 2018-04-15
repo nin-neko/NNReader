@@ -18,7 +18,7 @@ namespace NNReader.Bookmarks
         DateTimeOffset BookmarkedDate { get; }
         BookmarkInfoStatus Status { get; }
 
-        ReadOnlyObservableCollection<IChapter> Chapters { get; }
+        ReadOnlyObservableCollection<ILoadableChapter> Chapters { get; }
     }
 
     public interface ILoadableBookmarkInfo : IBookmarkInfo
@@ -37,5 +37,22 @@ namespace NNReader.Bookmarks
 
         event EventHandler ChapterLoaded;
         event EventHandler ChapterDownloaded;
+    }
+
+    public static class ILoadableBookmarkInfoExtensions
+    {
+        public static async Task<bool> LoadSummaryIfCanAsync(this ILoadableBookmarkInfo self)
+        {
+            if (!await self.IsSummaryLoadableAsync()) return false;
+            await self.LoadSummaryAsync();
+            return true;
+        }
+
+        public static async Task<bool> LoadChapterIfCanAsync(this ILoadableBookmarkInfo self)
+        {
+            if (!await self.IsChapterLoadableAsync()) return false;
+            await self.LoadChapterAsync();
+            return true;
+        }
     }
 }

@@ -20,6 +20,7 @@ namespace NNReader.Ordering
 
     public interface IOrderDiapatchable : IOrderChainable<IOrderDiapatchable>
     {
+        IOrderDiapatchable Next(string orderName);
         Task DispatchAsync();
     }
 

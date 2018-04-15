@@ -22,8 +22,8 @@ namespace NNReader.Shells.ViewModels
         {
             this.ContentRenderedCommand.Subscribe(async () =>
             {
-                var bookmarkService = container.Resolve<INarouBookmarkService>();
-                await bookmarkService.LoadAsync();
+                var builder = container.Resolve<Ordering.IOrderBuilder>();
+                await builder.From("LoadingBookmarkService").DispatchAsync();
             });
         }
 

@@ -10,11 +10,11 @@ using Prism.Mvvm;
 
 namespace NNReader.Bookmarks
 {
-    abstract class BookmarkInfo : BindableBase, IBookmarkInfo
+    abstract class BaseBookmarkInfo : BindableBase, IBookmarkInfo
     {
-        private readonly ObservableCollection<IChapter> novels = new ObservableCollection<IChapter>();
+        private readonly ObservableCollection<ILoadableChapter> chapters = new ObservableCollection<ILoadableChapter>();
 
-        protected BookmarkInfo(Guid id, string ncode)
+        protected BaseBookmarkInfo(Guid id, string ncode)
         {
             this.Id = id;
             this.Ncode = ncode;
@@ -23,7 +23,7 @@ namespace NNReader.Bookmarks
             this.BookmarkedDate = DateTimeOffset.Now;
             this.Status = BookmarkInfoStatus.Created;
 
-            this.Chapters = new ReadOnlyObservableCollection<IChapter>(this.novels);
+            this.Chapters = new ReadOnlyObservableCollection<ILoadableChapter>(this.chapters);
         }
 
         public Guid Id { get; }
@@ -57,12 +57,12 @@ namespace NNReader.Bookmarks
             protected set => this.SetProperty(ref status, value);
         }
 
-        public ReadOnlyObservableCollection<IChapter> Chapters { get; }
+        public ReadOnlyObservableCollection<ILoadableChapter> Chapters { get; }
 
-        protected void Add(IChapter novel) => novels.Add(novel);
+        protected void Add(ILoadableChapter novel) => chapters.Add(novel);
     }
 
-    abstract class BaseLoadableBookmarkInfo : BookmarkInfo, ILoadableBookmarkInfo
+    abstract class BaseLoadableBookmarkInfo : BaseBookmarkInfo, ILoadableBookmarkInfo
     {
         protected BaseLoadableBookmarkInfo(Guid id, string ncode)
             : base(id, ncode)
@@ -103,6 +103,10 @@ namespace NNReader.Bookmarks
                 await this.OnSummaryDownloadedAsync();
                 this.SummaryDownloaded?.Invoke(this, EventArgs.Empty);
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
             finally
             {
             }
@@ -139,6 +143,10 @@ namespace NNReader.Bookmarks
                 this.Status = BookmarkInfoStatus.ChapterLoaded;
                 await this.OnChapterDownloadedAsync();
                 this.ChapterDownloaded?.Invoke(this, EventArgs.Empty);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
             }
             finally
             {

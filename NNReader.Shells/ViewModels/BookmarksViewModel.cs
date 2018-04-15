@@ -20,7 +20,7 @@ namespace NNReader.Shells.ViewModels
 {
     class BookmarksViewModel
     {
-        public BookmarksViewModel(IContainerProvider container, IOrderBuilder orderBuilder, INarouBookmarkService bookmarkService)
+        public BookmarksViewModel(IContainerProvider container, IOrderBuilder orderBuilder, ILoadableBookmarkService bookmarkService)
         {
             this.NewNovelViewModel = container.Resolve<NewNovelViewModel>();
 
@@ -44,13 +44,13 @@ namespace NNReader.Shells.ViewModels
 
         public AsyncReactiveCommand Add { get; } = new AsyncReactiveCommand();
 
-        public ReadOnlyReactiveCollection<IBookmarkInfo> BookmarkInfos { get; }
+        public ReadOnlyReactiveCollection<ILoadableBookmarkInfo> BookmarkInfos { get; }
         public AsyncReactiveCommand<SelectionChangedEventArgs> SelectionChangedCommand { get; } = new AsyncReactiveCommand<SelectionChangedEventArgs>();
     }
 
     class NewNovelViewModel
     {
-        public NewNovelViewModel(IContainerProvider container, IOrderBuilder orderBuilder, INarouBookmarkService bookmarkService)
+        public NewNovelViewModel(IContainerProvider container, IOrderBuilder orderBuilder, ILoadableBookmarkService bookmarkService)
         {
             this.DownloadCommand = bookmarkService.ObserveProperty(x => x.Status)
                 .Select(x => x != BookmarkServiceStatus.BookmarkInfoDownloading && x != BookmarkServiceStatus.BookmarkInfoLoading)

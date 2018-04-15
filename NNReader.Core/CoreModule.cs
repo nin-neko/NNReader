@@ -28,12 +28,21 @@ namespace NNReader
             containerRegistry.RegisterSingleton<IOrderDispatcher, OrderDispatcher>();
             containerRegistry.RegisterSingleton<IOrderBuilder, OrderBuilder>();
 
-            containerRegistry.Register<IOrder, ChangingSelection>(nameof(ChangingSelection));
-            containerRegistry.Register<IOrder, ChangingNovelSelection>(nameof(ChangingNovelSelection));
+            containerRegistry.Register<IOrder, LoadingBookmarkService>(nameof(LoadingBookmarkService));
+            containerRegistry.Register<IOrder, LoadingBookmarkSummary>(nameof(LoadingBookmarkSummary));
+            containerRegistry.Register<IOrder, LoadingBookmarkChapter>(nameof(LoadingBookmarkChapter));
+            containerRegistry.Register<IOrder, LoadingChapterTitle>(nameof(LoadingChapterTitle));
+            containerRegistry.Register<IOrder, LoadingChapterContent>(nameof(LoadingChapterContent));
+            containerRegistry.Register<IOrder, RequestingBookmark>(nameof(RequestingBookmark));
+            containerRegistry.Register<IOrder, RequestingChapter>(nameof(RequestingChapter));
             containerRegistry.Register<IOrder, DownloadingBookmarkInfo>(nameof(DownloadingBookmarkInfo));
 
-            containerRegistry.RegisterSingleton<INarouBookmarkService, NarouBookmarkService>();
-            containerRegistry.RegisterSingleton<NarouBookmarkService>();
+            var service = new NarouBookmarkService();
+            containerRegistry.RegisterInstance<ILoadableBookmarkService>(service);
+            containerRegistry.RegisterInstance<BaseBookmarkService>(service);
+
+            //containerRegistry.RegisterInstance<ILoadableBookmarkService>(Debugging.MoqBookmarkService.Default);
+            //containerRegistry.RegisterInstance<BaseBookmarkService>(Debugging.MoqBookmarkService.Default);
         }
 
         public void OnInitialized(IContainerProvider containerProvider)

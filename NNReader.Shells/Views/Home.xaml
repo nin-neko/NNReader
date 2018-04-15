@@ -1,0 +1,133 @@
+﻿<UserControl x:Class="NNReader.Shells.Views.Home"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             d:DesignHeight="450"
+             d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <materialDesign:DialogHost
+            Grid.Row="1">
+
+            <materialDesign:DialogHost.DialogContent>
+                <StackPanel
+                    DataContext="{Binding NewBookmarkDialogViewModel, Mode=OneTime}"
+                    Margin="10">
+                    <TextBlock Text="Add New Bookmark: "/>
+                    <TextBox
+                        materialDesign:HintAssist.Hint="N-Code"
+                        Text="{Binding Ncode.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <StackPanel
+                        Margin="0,10,0,0"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right">
+                        <Button
+                            Style="{StaticResource MaterialDesignFlatButton}"
+                            IsDefault="True"
+                            Margin="0 8 8 0"
+                            Command="{Binding AcceptCommand, Mode=OneTime}"
+                            Content="Accept">
+                        </Button>
+                        <Button
+                            Style="{StaticResource MaterialDesignFlatButton}"
+                            IsCancel="True"
+                            Margin="0 8 8 0"
+                            Command="{Binding CancelCommand, Mode=OneTime}"
+                            Content="Cancel">
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </materialDesign:DialogHost.DialogContent>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="20"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="20"/>
+                </Grid.ColumnDefinitions>
+
+                <ItemsControl
+                    Grid.RowSpan="3"
+                    Grid.ColumnSpan="3"
+                    ItemsSource="{Binding Bookmarks, Mode=OneWay}">
+
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <materialDesign:Card
+                        Width="200"
+                        Height="200">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Loaded">
+                                        <prism:InvokeCommandAction Command="{Binding LoadedCommand, Mode=OneTime}"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="auto"/>
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Background="{DynamicResource PrimaryHueDarkBrush}">
+                                        <TextBlock
+                                    FontSize="20"
+                                    Text="{Binding Title.Value, Mode=OneWay}"/>
+                                        <TextBlock
+                                    Text="{Binding Writer.Value, Mode=OneWay}"/>
+                                        <TextBlock>
+                                    Chapter Count: 
+                                    <Run Text="{Binding ChapterCount.Value, Mode=OneWay}"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                    <Button
+                                Grid.Row="1"
+                                Command="{Binding ReadCommand, Mode=OneTime}"
+                                Content="Read"/>
+                                </Grid>
+                            </materialDesign:Card>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <Button
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}"
+                    Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}">
+                    <materialDesign:PackIcon Kind="BookmarkPlusOutline" />
+                </Button>
+            </Grid>
+        </materialDesign:DialogHost>
+
+        <ProgressBar
+            Grid.Row="2"
+            Height="10"
+            Visibility="{Binding IsLoading.Value, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+            IsIndeterminate="{Binding IsLoading.Value, Mode=OneWay}"/>
+    </Grid>
+</UserControl>

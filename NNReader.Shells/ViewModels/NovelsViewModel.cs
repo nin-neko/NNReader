@@ -20,33 +20,33 @@ namespace NNReader.Shells.ViewModels
 {
     class NovelsViewModel
     {
-        public NovelsViewModel(IContainerProvider container, IOrderBuilder orderBuilder, INarouBookmarkService bookmarkService)
+        public NovelsViewModel(IContainerProvider container, IOrderBuilder orderBuilder, ILoadableBookmarkService bookmarkService)
         {
-            this.IsEmpty = bookmarkService.ObserveProperty(x => x.SelectedBookmarkId)
-                .Select(x => x == Guid.Empty)
-                .ObserveOnUIDispatcher()
-                .ToReadOnlyReactivePropertySlim();
+            //this.IsEmpty = bookmarkService.ObserveProperty(x => x.SelectedBookmarkId)
+            //    .Select(x => x == Guid.Empty)
+            //    .ObserveOnUIDispatcher()
+            //    .ToReadOnlyReactivePropertySlim();
 
-            this.IsAnySelected = this.IsEmpty.Select(x => !x)
-                .ObserveOnUIDispatcher()
-                .ToReadOnlyReactivePropertySlim();
+            //this.IsAnySelected = this.IsEmpty.Select(x => !x)
+            //    .ObserveOnUIDispatcher()
+            //    .ToReadOnlyReactivePropertySlim();
 
-            this.Chapters = bookmarkService.Chapters.ToReadOnlyReactiveCollection(x => new ChapterViewModel(x), scheduler: UIDispatcherScheduler.Default);
+            //this.Chapters = bookmarkService.Chapters.ToReadOnlyReactiveCollection(x => new ChapterViewModel(x), scheduler: UIDispatcherScheduler.Default);
 
-            IDisposable contentSubscribing = default;
-            bookmarkService.ObserveProperty(x => x.SelectedNovelId)
-                .ObserveOnUIDispatcher()
-                .Subscribe(x =>
-                {
-                    contentSubscribing?.Dispose();
-                    if (x == Guid.Empty) return;
+            //IDisposable contentSubscribing = default;
+            //bookmarkService.ObserveProperty(x => x.SelectedNovelId)
+            //    .ObserveOnUIDispatcher()
+            //    .Subscribe(x =>
+            //    {
+            //        contentSubscribing?.Dispose();
+            //        if (x == Guid.Empty) return;
 
-                    var selected = bookmarkService.Chapters.Single(n => n.Id == x);
+            //        var selected = bookmarkService.Chapters.Single(n => n.Id == x);
 
-                    contentSubscribing = selected.ObserveProperty(xx => xx.Content)
-                        .ObserveOnUIDispatcher()
-                        .Subscribe(xx => this.NovelContent.Value = xx);
-                });
+            //        contentSubscribing = selected.ObserveProperty(xx => xx.Content)
+            //            .ObserveOnUIDispatcher()
+            //            .Subscribe(xx => this.NovelContent.Value = xx);
+            //    });
 
             this.SelectionChangedCommand.Subscribe(async e =>
             {
@@ -66,31 +66,5 @@ namespace NNReader.Shells.ViewModels
         public ReactivePropertySlim<string> NovelContent { get; } = new ReactivePropertySlim<string>("");
     }
 
-    class ChapterViewModel : IDisposable
-    {
-        private readonly System.Reactive.Disposables.CompositeDisposable disposables = new System.Reactive.Disposables.CompositeDisposable();
-
-        public ChapterViewModel(IChapter chapter)
-        {
-            this.Id = chapter.Id;
-
-            this.Title = chapter.ObserveProperty(x => x.Title)
-                .ObserveOnUIDispatcher()
-                .ToReadOnlyReactivePropertySlim()
-                .AddTo(disposables);
-
-            this.Status = chapter.ObserveProperty(x => x.Status)
-                .Select(x => x.ToString())
-                .ObserveOnUIDispatcher()
-                .ToReadOnlyReactivePropertySlim()
-                .AddTo(disposables);
-        }
-
-        public Guid Id { get; }
-
-        public ReadOnlyReactivePropertySlim<string> Title { get; }
-        public ReadOnlyReactivePropertySlim<string> Status { get; }
-
-        public void Dispose() => disposables.Dispose();
-    }
+    
 }

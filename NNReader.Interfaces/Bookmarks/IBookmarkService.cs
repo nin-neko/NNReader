@@ -11,24 +11,49 @@ namespace NNReader.Bookmarks
 {
     public interface IBookmarkService : INotifyPropertyChanged
     {
-        ReadOnlyObservableCollection<IBookmarkInfo> Bookmarks { get; }
-
-        Guid SelectedBookmarkId { get; }
-
-        ReadOnlyObservableCollection<IChapter> Chapters { get; }
-
-        Guid SelectedNovelId { get; }
+        ReadOnlyObservableCollection<ILoadableBookmarkInfo> Bookmarks { get; }
 
         BookmarkServiceStatus Status { get; }
+
+        event EventHandler<BookmarkRequestEventArgs> BookmarkRequested;
+        event EventHandler<ChapterRequestEventArgs> ChapterRequested;
     }
 
-    public interface INarouBookmarkService : IBookmarkService
+    public class BookmarkRequestEventArgs : EventArgs
     {
+        public BookmarkRequestEventArgs(IBookmarkInfo bookmarkInfo)
+            => this.Bookmark = bookmarkInfo;
+
+        public IBookmarkInfo Bookmark { get; }
+    }
+
+    public class ChapterRequestEventArgs : EventArgs
+    {
+        public ChapterRequestEventArgs(IChapter chapter)
+            => this.Chapter = chapter;
+
+        public IChapter Chapter { get; }
+    }
+
+    public interface ILoadableBookmarkService : IBookmarkService
+    {
+        Task<bool> IsLoadableAsync();
+
         Task LoadAsync();
         Task DownloadAsync(string ncode);
         
         event EventHandler Loaded;
+        event EventHandler LoadingFailed;
         event EventHandler Downloaded;
         event EventHandler DownloadingFailed;
+    }
+
+    public static class ILoadableBookmarkServiceExtensions
+    {
+        public static async Task LoadIfCanAsync(this ILoadableBookmarkService self)
+        {
+            if (!await self.IsLoadableAsync()) return;
+            await self.LoadAsync();
+        }
     }
 }
