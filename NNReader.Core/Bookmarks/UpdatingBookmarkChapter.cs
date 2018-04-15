@@ -18,7 +18,7 @@ using NNReader.Ordering;
 
 namespace NNReader.Bookmarks
 {
-    class LoadingBookmarkSummary : BaseOrder
+    class UpdatingBookmarkChapter : BaseOrder
     {
         public static readonly string IdContext = nameof(IdContext);
 
@@ -27,12 +27,15 @@ namespace NNReader.Bookmarks
             var id = (Guid)this.Contexts[IdContext];
             var bookmarkService = this.Container.Resolve<ILoadableBookmarkService>();
 
-            var bookmark = bookmarkService.Bookmarks.Single(x => x.Id == id);
+            var bookmark = (NarouBookmarkInfo)bookmarkService.Bookmarks.Single(x => x.Id == id);
 
-            if (bookmark.Status == BookmarkInfoStatus.SummaryLoaded) return;
+            if (bookmark.Status != BookmarkInfoStatus.ChapterLoaded)
+            {
+                var can = await bookmark.LoadChapterIfCanAsync();
+                if (!can) await bookmark.DownloadChapterAsync();
+            }
 
-            var can = await bookmark.LoadSummaryIfCanAsync();
-            if (!can) await bookmark.DownloadSummaryAsync();
+            await bookmark.CheckUpdateAsync();
         }
     }
 }

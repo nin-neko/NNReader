@@ -74,6 +74,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bookmarks\UpdatingBookmarkChapter.cs" />
     <Compile Include="Bookmarks\LoadingChapterContent.cs" />
     <Compile Include="Bookmarks\LoadingChapterTitle.cs" />
     <Compile Include="Bookmarks\LoadingBookmarkChapter.cs" />

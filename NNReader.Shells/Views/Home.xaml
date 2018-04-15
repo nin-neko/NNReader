@@ -81,13 +81,15 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <materialDesign:Card
-                        Width="200"
-                        Height="200">
+                                MinWidth="200"
+                                Height="200">
+                                
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="Loaded">
                                         <prism:InvokeCommandAction Command="{Binding LoadedCommand, Mode=OneTime}"/>
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
+                                
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="*"/>
@@ -95,19 +97,37 @@
                                     </Grid.RowDefinitions>
                                     <StackPanel Background="{DynamicResource PrimaryHueDarkBrush}">
                                         <TextBlock
-                                    FontSize="20"
-                                    Text="{Binding Title.Value, Mode=OneWay}"/>
+                                            FontSize="20"
+                                            Text="{Binding Title.Value, Mode=OneWay}"/>
                                         <TextBlock
-                                    Text="{Binding Writer.Value, Mode=OneWay}"/>
+                                            Text="{Binding Writer.Value, Mode=OneWay}"/>
                                         <TextBlock>
-                                    Chapter Count: 
-                                    <Run Text="{Binding ChapterCount.Value, Mode=OneWay}"/>
+                                            Chapter Count: 
+                                            <Run Text="{Binding ChapterCount.Value, Mode=OneWay}"/>
                                         </TextBlock>
+                                        <TextBlock>
+                                            Bookmarked Date: 
+                                            <Run Text="{Binding BookmarkedDate.Value, Mode=OneWay}"/>
+                                        </TextBlock>
+                                        <Button
+                                            Margin="0,0,20,0"
+                                            Style="{StaticResource MaterialDesignFloatingActionButton}"
+                                            materialDesign:ButtonProgressAssist.IsIndicatorVisible="{Binding Updating.Value, Mode=OneWay}"
+                                            materialDesign:ButtonProgressAssist.IsIndeterminate="{Binding Updating.Value, Mode=OneWay}"
+                                            materialDesign:ButtonProgressAssist.Value="-1"
+                                            HorizontalAlignment="Right"
+                                            Command="{Binding UpdateCommand, Mode=OneTime}">
+                                            <materialDesign:PackIcon
+                                                Width="30"
+                                                Height="30"
+                                                Kind="Reload" />
+                                        </Button>
                                     </StackPanel>
                                     <Button
-                                Grid.Row="1"
-                                Command="{Binding ReadCommand, Mode=OneTime}"
-                                Content="Read"/>
+                                        Grid.Row="1"
+                                        Margin="5"
+                                        Command="{Binding ReadCommand, Mode=OneTime}"
+                                        Content="Read"/>
                                 </Grid>
                             </materialDesign:Card>
                         </DataTemplate>

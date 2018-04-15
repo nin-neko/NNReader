@@ -25,7 +25,6 @@ namespace NNReader.Bookmarks
         ChapterLoading,
         ChapterDownloading,
         ChapterLoaded,
-        AllChapterLoaded,
     }
 
     public enum ChapterStatus

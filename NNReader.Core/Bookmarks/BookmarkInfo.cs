@@ -20,7 +20,7 @@ namespace NNReader.Bookmarks
             this.Ncode = ncode;
             this.Title = "";
             this.Writer = "";
-            this.BookmarkedDate = DateTimeOffset.Now;
+            this.BookmarkedDate = DateTimeOffset.MinValue;
             this.Status = BookmarkInfoStatus.Created;
 
             this.Chapters = new ReadOnlyObservableCollection<ILoadableChapter>(this.chapters);
