@@ -7,6 +7,7 @@ using System.Windows;
 
 using Prism.Modularity;
 using Prism.Ioc;
+using Prism.Regions;
 
 
 namespace NNReader.Shells
@@ -27,6 +28,13 @@ namespace NNReader.Shells
 
         public void OnInitialized(IContainerProvider containerProvider)
         {
+            var rm = containerProvider.Resolve<IRegionManager>();
+            rm.RegisterViewWithRegion(nameof(Views.ShellContent), typeof(Views.ShellContent));
+            //rm.RegisterViewWithRegion(nameof(Views.Bookmarks), typeof(Views.Bookmarks));
+            //rm.RegisterViewWithRegion(nameof(Views.Novels), typeof(Views.Novels));
+            rm.RegisterViewWithRegion(nameof(Views.Home), typeof(Views.Home));
+            rm.RegisterViewWithRegion(nameof(Views.ReadingRoom), typeof(Views.ReadingRoom));
+            rm.RegisterViewWithRegion(nameof(Views.ReadingRooms), typeof(Views.ReadingRooms));
         }
     }
 }

@@ -3,11 +3,29 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:prism="http://prismlibrary.com/"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
+        prism:ViewModelLocator.AutoWireViewModel="True"
         Title="NNReader"
         Height="450"
-        Width="800">
-    <Grid>
-        
-    </Grid>
+        Width="1000"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal" 
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}">
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="ContentRendered">
+            <prism:InvokeCommandAction Command="{Binding ContentRenderedCommand, Mode=OneTime}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <ContentControl
+        Focusable="False"
+        prism:RegionManager.RegionName="ShellContent"/>
 </Window>

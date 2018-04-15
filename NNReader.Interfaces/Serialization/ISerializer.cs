@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NNReader.Interfaces
+
+namespace NNReader.Serialization
 {
-    public class Class1
+    public interface ISerializer
     {
+        Task SaveAsync();
     }
 }

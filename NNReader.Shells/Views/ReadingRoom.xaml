@@ -1,0 +1,121 @@
+﻿<UserControl x:Class="NNReader.Shells.Views.ReadingRoom"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:materialDesignin="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:aaa="clr-namespace:XamlGeneratedNamespace;assembly=MaterialDesignThemes.Wpf"
+             mc:Ignorable="d" 
+             prism:ViewModelLocator.AutoWireViewModel="False"
+             d:DesignHeight="450"
+             d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ListBox.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid
+            Grid.ColumnSpan="2"
+            Background="{DynamicResource PrimaryHueDarkBrush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <Button
+                Command="{Binding BackCommand, Mode=OneTime}"
+                Content="Back"/>
+        </Grid>
+
+        <ListBox
+            Grid.Row="1"
+            Width="200"
+            HorizontalContentAlignment="Stretch"
+            ItemsSource="{Binding Chapters, Mode=OneWay}">
+
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <prism:InvokeCommandAction Command="{Binding SelectionChangedCommand, Mode=OneTime}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                    <Setter Property="IsSelected" Value="{Binding IsSelected.Value, Mode=TwoWay}"/>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Loaded">
+                                <prism:InvokeCommandAction Command="{Binding LoadedCommand, Mode=OneTime}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                        
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding Title.Value, Mode=OneWay}"/>
+                        <TextBlock
+                            Grid.Column="2"
+                            Text="{Binding Status.Value, Mode=OneWay}"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <Border
+            Grid.Row="1"
+            Visibility="{Binding Loading.Value, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <TextBlock
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontSize="20"
+                Text="Loading"/>
+        </Border>
+
+        <materialDesignin:Card
+            Grid.Row="1"
+            Grid.Column="1"
+            Margin="10"
+            VerticalAlignment="Stretch">
+            <ScrollViewer>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        FontSize="20"
+                        Text="{Binding ChapterTitle.Value, Mode=OneWay}"/>
+                    <TextBlock
+                        Grid.Row="1"
+                        Text="{Binding ChapterContent.Value, Mode=OneWay}"/>
+                </Grid>
+            </ScrollViewer>
+        </materialDesignin:Card>
+        
+    </Grid>
+</UserControl>
