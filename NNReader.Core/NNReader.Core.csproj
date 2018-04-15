@@ -106,6 +106,7 @@
     <Compile Include="Serialization\Deserializer.cs" />
     <Compile Include="Serialization\BookmarkInfoSerializer.cs" />
     <Compile Include="Serialization\Serializer.cs" />
+    <Compile Include="Shells\DialogService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NNReader.Interfaces\NNReader.Interfaces.csproj">

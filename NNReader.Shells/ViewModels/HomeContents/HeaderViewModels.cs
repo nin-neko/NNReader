@@ -17,11 +17,11 @@ namespace NNReader.Shells.ViewModels.HomeContents
 {
     class HeaderViewModels
     {
-        public HeaderViewModels(AboutViewModels aboutViewModels)
+        public HeaderViewModels(AboutViewModel aboutViewModels)
         {
             this.AboutViewModels = aboutViewModels;
         }
 
-        public AboutViewModels AboutViewModels { get; }
+        public AboutViewModel AboutViewModels { get; }
     }
 }

@@ -53,6 +53,26 @@ namespace NNReader.Diagnostics
         }
     }
 
+    sealed class ControlzEx : BaseMitComponent
+    {
+        public ControlzEx()
+        {
+            this.Name = "ControlzEx";
+            this.ProjectUrl = "https://github.com/ControlzEx/ControlzEx";
+            this.LicenseUrl = "https://github.com/ControlzEx/ControlzEx/blob/develop/LICENSE";
+        }
+    }
+
+    sealed class MahApps : BaseMitComponent
+    {
+        public MahApps()
+        {
+            this.Name = "MahApps.Metro";
+            this.ProjectUrl = "https://github.com/MahApps/MahApps.Metro";
+            this.LicenseUrl = "https://github.com/MahApps/MahApps.Metro/blob/develop/LICENSE";
+        }
+    }
+
     sealed class MaterialDesignInXAMLToolkit : BaseMitComponent
     {
         public MaterialDesignInXAMLToolkit()

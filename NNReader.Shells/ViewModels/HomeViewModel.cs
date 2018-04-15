@@ -22,9 +22,8 @@ namespace NNReader.Shells.ViewModels
 {
     class HomeViewModel
     {
-        public HomeViewModel(HeaderViewModels headerViewModels, NewBookmarkDialogViewModel newBookmarkDialogViewModel, IOrderBuilder orderBuilder, ILoadableBookmarkService loadableBookmarkService)
+        public HomeViewModel(NewBookmarkDialogViewModel newBookmarkDialogViewModel, IOrderBuilder orderBuilder, ILoadableBookmarkService loadableBookmarkService)
         {
-            this.HeaderViewModels = headerViewModels;
             this.NewBookmarkDialogViewModel = newBookmarkDialogViewModel;
             this.Bookmarks = loadableBookmarkService.Bookmarks.ToReadOnlyReactiveCollection(x => new BookmarkInfoViewModel(orderBuilder, x), UIDispatcherScheduler.Default);
 
@@ -34,7 +33,6 @@ namespace NNReader.Shells.ViewModels
                 .ToReadOnlyReactivePropertySlim();
         }
 
-        public HeaderViewModels HeaderViewModels { get; }
         public NewBookmarkDialogViewModel NewBookmarkDialogViewModel { get; }
         public ReadOnlyReactiveCollection<BookmarkInfoViewModel> Bookmarks { get; }
 

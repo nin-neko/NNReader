@@ -20,6 +20,8 @@ namespace NNReader.Diagnostics
             {
                 new AngleSharp(),
                 new CommonServiceLocator(),
+                new ControlzEx(),
+                new MahApps(),
                 new MaterialDesignInXAMLToolkit(),
                 new JsonNet(),
                 new Prism(),

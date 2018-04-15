@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace NNReader.Shells.Views.HomeContents
+namespace NNReader.Shells.Views
 {
     /// <summary>
     /// Header.xaml の相互作用ロジック

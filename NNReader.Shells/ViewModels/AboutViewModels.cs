@@ -15,18 +15,25 @@ using NNReader.Ordering;
 using NNReader.Diagnostics;
 
 
-namespace NNReader.Shells.ViewModels.HomeContents
+namespace NNReader.Shells.ViewModels
 {
-    class AboutViewModels
+    class AboutViewModel
     {
-        public AboutViewModels(IComponentService componentService)
+        public AboutViewModel(IComponentService componentService, IDialogService dialogService)
         {
             this.Version = componentService.Version;
             this.Components = componentService.Components.Select(x => new ComponentViewModel(x)).ToArray();
+
+            this.CloseCommand.Subscribe(() =>
+            {
+                dialogService.IsOpen = false;
+            });
         }
 
         public string Version { get; }
         public ComponentViewModel[] Components { get; }
+
+        public ReactiveCommand CloseCommand { get; } = new ReactiveCommand();
     }
 
     class ComponentViewModel

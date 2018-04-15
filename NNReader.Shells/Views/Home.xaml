@@ -22,10 +22,10 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <ContentControl
+        <!--<ContentControl
             DataContext="{Binding HeaderViewModels, Mode=OneTime}"
             Focusable="False"
-            prism:RegionManager.RegionName="Header"/>
+            prism:RegionManager.RegionName="Header"/>-->
 
         <materialDesign:DialogHost
             Grid.Row="1">
