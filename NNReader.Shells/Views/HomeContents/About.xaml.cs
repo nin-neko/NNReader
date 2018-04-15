@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace NNReader.Shells.Views
+namespace NNReader.Shells.Views.HomeContents
 {
     /// <summary>
-    /// Novels.xaml の相互作用ロジック
+    /// Header.xaml の相互作用ロジック
     /// </summary>
-    public partial class Novels : UserControl
+    public partial class About : UserControl
     {
-        public Novels()
+        public About()
         {
             InitializeComponent();
         }

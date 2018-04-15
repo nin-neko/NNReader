@@ -79,6 +79,8 @@
     <Compile Include="Bookmarks\LoadingChapterTitle.cs" />
     <Compile Include="Bookmarks\LoadingBookmarkChapter.cs" />
     <Compile Include="Bookmarks\NarouBookmarkService.cs" />
+    <Compile Include="Diagnostics\Component.cs" />
+    <Compile Include="Diagnostics\ComponentService.cs" />
     <Compile Include="Net\NarouUrlBuilder.cs" />
     <Compile Include="Net\NarouClient.cs" />
     <Compile Include="Net\BaseNarouClient.cs" />
@@ -137,6 +139,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy /y $(ProjectDir)bin\$(ConfigurationName) $(SolutionDir)NNReader\bin\$(ConfigurationName)</PostBuildEvent>

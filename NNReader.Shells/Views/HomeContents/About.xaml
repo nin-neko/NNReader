@@ -1,0 +1,49 @@
+﻿<UserControl x:Class="NNReader.Shells.Views.HomeContents.About"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             prism:ViewModelLocator.AutoWireViewModel="True">
+    
+    <StackPanel Margin="15">
+        <StackPanel Orientation="Horizontal">
+            <TextBlock>
+                <Run
+                    FontSize="25"
+                    Text="NNReader "/>
+                <Run Text="{Binding Version, Mode=OneTime}"/>
+            </TextBlock>
+        </StackPanel>
+
+        <StackPanel>
+            <TextBlock Text="依存コンポーネント: "/>
+            <ItemsControl
+                ItemsSource="{Binding Components, Mode=OneTime}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock>
+                            <Hyperlink
+                                Command="{Binding LinkClickCommand, Mode=OneTime}"
+                                CommandParameter="{Binding NavigateUri, RelativeSource={RelativeSource Self}}"
+                                NavigateUri="{Binding ProjectUrl, Mode=OneTime}">
+                                <Run Text="{Binding Name, Mode=OneTime}"/>
+                            </Hyperlink>
+                            <Hyperlink
+                                Command="{Binding LinkClickCommand, Mode=OneTime}"
+                                CommandParameter="{Binding NavigateUri, RelativeSource={RelativeSource Self}}"
+                                NavigateUri="{Binding LicenseUrl, Mode=OneTime}">
+                                [
+                                <Run Text="{Binding License, Mode=OneTime}"/>
+                                ]
+                            </Hyperlink>
+                        </TextBlock>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+        
+    </StackPanel>
+</UserControl>

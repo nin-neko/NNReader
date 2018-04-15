@@ -1,0 +1,54 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Diagnostics;
+using System.Reactive.Linq;
+
+using Reactive.Bindings;
+using Reactive.Bindings.Binding;
+using Reactive.Bindings.Extensions;
+
+using NNReader.Bookmarks;
+using NNReader.Ordering;
+using NNReader.Diagnostics;
+
+
+namespace NNReader.Shells.ViewModels.HomeContents
+{
+    class AboutViewModels
+    {
+        public AboutViewModels(IComponentService componentService)
+        {
+            this.Version = componentService.Version;
+            this.Components = componentService.Components.Select(x => new ComponentViewModel(x)).ToArray();
+        }
+
+        public string Version { get; }
+        public ComponentViewModel[] Components { get; }
+    }
+
+    class ComponentViewModel
+    {
+        public ComponentViewModel(IComponent component)
+        {
+            this.Name = component.Name;
+            this.ProjectUrl = component.ProjectUrl;
+            this.License = component.License;
+            this.LicenseUrl = component.LicenseUrl;
+
+            this.LinkClickCommand.Subscribe(x =>
+            {
+                Process.Start(x.AbsoluteUri);
+            });
+        }
+
+        public string Name { get; }
+        public string ProjectUrl { get; }
+        public string License { get; }
+        public string LicenseUrl { get; }
+
+        public ReactiveCommand<Uri> LinkClickCommand { get; } = new ReactiveCommand<Uri>();
+    }
+}

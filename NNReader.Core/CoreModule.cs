@@ -25,6 +25,8 @@ namespace NNReader
             containerRegistry.RegisterInstance(IO.Locator.Default);
             containerRegistry.RegisterInstance<IO.ILocator>(IO.Locator.Default);
 
+            containerRegistry.RegisterSingleton<Diagnostics.IComponentService, Diagnostics.ComponentService>();
+
             containerRegistry.RegisterSingleton<IOrderDispatcher, OrderDispatcher>();
             containerRegistry.RegisterSingleton<IOrderBuilder, OrderBuilder>();
 
