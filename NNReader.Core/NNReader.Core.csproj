@@ -79,6 +79,8 @@
     <Compile Include="Bookmarks\LoadingChapterTitle.cs" />
     <Compile Include="Bookmarks\LoadingBookmarkChapter.cs" />
     <Compile Include="Bookmarks\NarouBookmarkService.cs" />
+    <Compile Include="Diagnostics\Component.cs" />
+    <Compile Include="Diagnostics\ComponentService.cs" />
     <Compile Include="Net\NarouUrlBuilder.cs" />
     <Compile Include="Net\NarouClient.cs" />
     <Compile Include="Net\BaseNarouClient.cs" />
@@ -104,6 +106,7 @@
     <Compile Include="Serialization\Deserializer.cs" />
     <Compile Include="Serialization\BookmarkInfoSerializer.cs" />
     <Compile Include="Serialization\Serializer.cs" />
+    <Compile Include="Shells\DialogService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NNReader.Interfaces\NNReader.Interfaces.csproj">
@@ -137,6 +140,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy /y $(ProjectDir)bin\$(ConfigurationName) $(SolutionDir)NNReader\bin\$(ConfigurationName)</PostBuildEvent>

@@ -22,6 +22,11 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
+        <!--<ContentControl
+            DataContext="{Binding HeaderViewModels, Mode=OneTime}"
+            Focusable="False"
+            prism:RegionManager.RegionName="Header"/>-->
+
         <materialDesign:DialogHost
             Grid.Row="1">
 
@@ -70,6 +75,7 @@
                 <ItemsControl
                     Grid.RowSpan="3"
                     Grid.ColumnSpan="3"
+                    Padding="10"
                     ItemsSource="{Binding Bookmarks, Mode=OneWay}">
 
                     <ItemsControl.ItemsPanel>

@@ -25,6 +25,8 @@ namespace NNReader
             containerRegistry.RegisterInstance(IO.Locator.Default);
             containerRegistry.RegisterInstance<IO.ILocator>(IO.Locator.Default);
 
+            containerRegistry.RegisterSingleton<Diagnostics.IComponentService, Diagnostics.ComponentService>();
+
             containerRegistry.RegisterSingleton<IOrderDispatcher, OrderDispatcher>();
             containerRegistry.RegisterSingleton<IOrderBuilder, OrderBuilder>();
 
@@ -44,6 +46,8 @@ namespace NNReader
 
             //containerRegistry.RegisterInstance<ILoadableBookmarkService>(Debugging.MoqBookmarkService.Default);
             //containerRegistry.RegisterInstance<BaseBookmarkService>(Debugging.MoqBookmarkService.Default);
+
+            containerRegistry.RegisterSingleton<Shells.IDialogService, Shells.DialogService>();
         }
 
         public void OnInitialized(IContainerProvider containerProvider)
