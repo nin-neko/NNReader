@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace NNReader.Shells.Views
+namespace NNReader.Shells.Views.HomeContents
 {
     /// <summary>
-    /// Bookmarks.xaml の相互作用ロジック
+    /// Header.xaml の相互作用ロジック
     /// </summary>
-    public partial class Bookmarks : UserControl
+    public partial class Header : UserControl
     {
-        public Bookmarks()
+        public Header()
         {
             InitializeComponent();
         }
