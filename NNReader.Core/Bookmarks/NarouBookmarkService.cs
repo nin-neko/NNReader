@@ -26,10 +26,17 @@ namespace NNReader.Bookmarks
         {
         }
 
-        public override async Task<bool> IsLoadableAsync()
+        private static IEnumerable<string> FindPersistedFolders()
         {
             var locator = IO.Locator.Default;
+            var licenseFolderPath = Path.Combine(locator.BootstrapperDirectory, "License");
             return Directory.EnumerateDirectories(locator.BootstrapperDirectory)
+                .Where(x => x != licenseFolderPath);
+        }
+
+        public override async Task<bool> IsLoadableAsync()
+        {
+            return FindPersistedFolders()
                 //.Where()// todo: regex check
                 .Any();
         }
@@ -45,8 +52,7 @@ namespace NNReader.Bookmarks
 
         protected override async Task DoLoadingAsync()
         {
-            var locator = IO.Locator.Default;
-            foreach (var x in Directory.EnumerateDirectories(locator.BootstrapperDirectory))
+            foreach (var x in FindPersistedFolders())
             {
                 var ncode = Path.GetFileName(x);
                 var bookmark = new NarouBookmarkInfo(ncode);
