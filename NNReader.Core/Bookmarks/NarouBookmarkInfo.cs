@@ -35,14 +35,14 @@ namespace NNReader.Bookmarks
         public override async Task<bool> IsChapterLoadableAsync()
         {
             if (this.Status == BookmarkInfoStatus.ChapterLoading || this.Status == BookmarkInfoStatus.ChapterDownloading) return false;
-            if (this.Status == BookmarkInfoStatus.ChapterLoaded || this.Status == BookmarkInfoStatus.AllChapterLoaded) return false;
+            if (this.Status == BookmarkInfoStatus.ChapterLoaded) return false;
             return await new BookmarkInfoDeserializer(this.Ncode).LoadableChapterAsync();
         }
 
         protected override async Task DoSummaryLoading()
         {
             var deserializer = new BookmarkInfoDeserializer(this.Ncode);
-            (this.Title, this.Writer) = await deserializer.GetSummaryAsync();
+            (this.Title, this.Writer, this.BookmarkedDate) = await deserializer.GetSummaryAsync();
         }
 
         protected override async Task DoSummaryDownloading()
@@ -87,6 +87,36 @@ namespace NNReader.Bookmarks
             await new BookmarkInfoSerializer(this)
                 .WithAll()
                 .SaveAsync();
+        }
+
+        public async Task CheckUpdateAsync()
+        {
+            this.Status = BookmarkInfoStatus.ChapterDownloading;
+            var narou = new NarouClient();
+            try
+            {
+                var count = await narou.GetChapterCountAsync(this.Ncode);
+
+                if (count == this.Chapters.Count) return;
+
+                var startIndex = this.Chapters.Count + 1;
+                var updateCount = count - this.Chapters.Count;
+                var newChapters = new List<NarouChapter>();
+                for (int i = 0; i < updateCount; i++)
+                {
+                    var index = i + startIndex;
+                    var chapter = new NarouChapter(this.Ncode, index);
+                    newChapters.Add(chapter);
+                    this.Add(chapter);
+                }
+
+                //await Task.WhenAll(newChapters.Select(x => x.DownloadTitleAsync()));
+            }
+            finally
+            {
+                this.Status = BookmarkInfoStatus.ChapterLoaded;
+            }
+            
         }
     }
 }

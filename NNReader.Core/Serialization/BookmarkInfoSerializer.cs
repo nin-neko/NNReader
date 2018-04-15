@@ -42,7 +42,13 @@ namespace NNReader.Serialization
             return this;
         }
 
-        public BookmarkInfoSerializer WithSummary() => this.WithNcode().WithTitle().WithWriter();
+        public BookmarkInfoSerializer WithBookmarkedDate()
+        {
+            serialized[nameof(IBookmarkInfo.BookmarkedDate)] = bookmarkInfo.BookmarkedDate;
+            return this;
+        }
+
+        public BookmarkInfoSerializer WithSummary() => this.WithNcode().WithTitle().WithWriter().WithBookmarkedDate();
 
         public BookmarkInfoSerializer WithChapters()
         {
@@ -91,7 +97,8 @@ namespace NNReader.Serialization
                 var jtoken = await ReadJTokenAsync(filePath);
                 var title = jtoken[nameof(IBookmarkInfo.Title)];
                 var writer = jtoken[nameof(IBookmarkInfo.Writer)];
-                if (title == null || writer == null) return false;
+                var bookmarkedDate = jtoken[nameof(IBookmarkInfo.BookmarkedDate)];
+                if (title == null || writer == null || bookmarkedDate == null) return false;
             }
             catch (Exception)
             {
@@ -101,15 +108,16 @@ namespace NNReader.Serialization
             return true;
         }
 
-        public async Task<(string Title, string Writer)> GetSummaryAsync()
+        public async Task<(string Title, string Writer, DateTimeOffset BookmarkedDate)> GetSummaryAsync()
         {
             var filePath = this.BuildFilePath();
 
             var jtoken = await ReadJTokenAsync(filePath);
             var title = jtoken[nameof(IBookmarkInfo.Title)].ToString();
             var writer = jtoken[nameof(IBookmarkInfo.Writer)].ToString();
+            var bookmarkedDate = jtoken[nameof(IBookmarkInfo.BookmarkedDate)].ToObject<DateTimeOffset>();
 
-            return (title, writer);
+            return (title, writer, bookmarkedDate);
         }
 
         public async Task<bool> LoadableChapterAsync()
@@ -123,8 +131,9 @@ namespace NNReader.Serialization
                 var jtoken = await ReadJTokenAsync(filePath);
                 var title = jtoken[nameof(IBookmarkInfo.Title)];
                 var writer = jtoken[nameof(IBookmarkInfo.Writer)];
+                var bookmarkedDate = jtoken[nameof(IBookmarkInfo.BookmarkedDate)];
                 var chapters = jtoken[nameof(IBookmarkInfo.Chapters)];
-                if (title == null || writer == null || chapters == null) return false;
+                if (title == null || writer == null || bookmarkedDate == null || chapters == null) return false;
             }
             catch (Exception)
             {

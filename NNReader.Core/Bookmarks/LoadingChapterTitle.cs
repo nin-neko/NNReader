@@ -28,6 +28,9 @@ namespace NNReader.Bookmarks
             var bookmarkService = this.Container.Resolve<ILoadableBookmarkService>();
 
             var chapter = bookmarkService.Bookmarks.SelectMany(x => x.Chapters).Single(x => x.Id == id);
+
+            if (chapter.Status == ChapterStatus.TitleLoaded) return;
+
             var can = await chapter.LoadTitleIfCanAsync();
             if (!can) await chapter.DownloadTitleAsync();
         }

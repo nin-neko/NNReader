@@ -52,6 +52,7 @@ namespace NNReader.Bookmarks
     {
         public static async Task LoadIfCanAsync(this ILoadableBookmarkService self)
         {
+            if (self.Status == BookmarkServiceStatus.Loaded) return;
             if (!await self.IsLoadableAsync()) return;
             await self.LoadAsync();
         }

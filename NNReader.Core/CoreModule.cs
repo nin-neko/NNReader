@@ -36,6 +36,7 @@ namespace NNReader
             containerRegistry.Register<IOrder, RequestingBookmark>(nameof(RequestingBookmark));
             containerRegistry.Register<IOrder, RequestingChapter>(nameof(RequestingChapter));
             containerRegistry.Register<IOrder, DownloadingBookmarkInfo>(nameof(DownloadingBookmarkInfo));
+            containerRegistry.Register<IOrder, UpdatingBookmarkChapter>(nameof(UpdatingBookmarkChapter));
 
             var service = new NarouBookmarkService();
             containerRegistry.RegisterInstance<ILoadableBookmarkService>(service);

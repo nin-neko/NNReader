@@ -43,6 +43,7 @@ namespace NNReader.Bookmarks
     {
         public static async Task<bool> LoadSummaryIfCanAsync(this ILoadableBookmarkInfo self)
         {
+            if (self.Status == BookmarkInfoStatus.SummaryLoaded) return false;
             if (!await self.IsSummaryLoadableAsync()) return false;
             await self.LoadSummaryAsync();
             return true;
@@ -50,6 +51,7 @@ namespace NNReader.Bookmarks
 
         public static async Task<bool> LoadChapterIfCanAsync(this ILoadableBookmarkInfo self)
         {
+            if (self.Status == BookmarkInfoStatus.ChapterLoaded) return false;
             if (!await self.IsChapterLoadableAsync()) return false;
             await self.LoadChapterAsync();
             return true;

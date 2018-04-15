@@ -66,6 +66,27 @@ namespace NNReader.Shells.ViewModels
                 .ToReadOnlyReactivePropertySlim()
                 .AddTo(this.CompositeDisposable);
 
+            this.BookmarkedDate = bookmarkInfo.ObserveProperty(x => x.BookmarkedDate)
+                .Select(x => $"{x}")
+                .ObserveOnUIDispatcher()
+                .ToReadOnlyReactivePropertySlim()
+                .AddTo(this.CompositeDisposable);
+
+            this.Updating = bookmarkInfo.ObserveProperty(x => x.Status)
+                .Select(x => x == BookmarkInfoStatus.SummaryDownloading || x == BookmarkInfoStatus.ChapterDownloading || x == BookmarkInfoStatus.SummaryLoading || x == BookmarkInfoStatus.ChapterLoading)
+                .ObserveOnUIDispatcher()
+                .ToReadOnlyReactivePropertySlim()
+                .AddTo(this.CompositeDisposable);
+
+            this.UpdateCommand = new AsyncReactiveCommand()
+                .WithSubscribe(async () =>
+                {
+                    await orderBuilder.From("UpdatingBookmarkChapter")
+                        .With("Id", bookmarkInfo.Id)
+                        .DispatchAsync();
+                })
+                .AddTo(this.CompositeDisposable);
+
             this.ReadCommand = new AsyncReactiveCommand()
                 .WithSubscribe(async () =>
                 {
@@ -82,6 +103,9 @@ namespace NNReader.Shells.ViewModels
         public ReadOnlyReactivePropertySlim<string> Title { get; }
         public ReadOnlyReactivePropertySlim<string> Writer { get; }
         public ReadOnlyReactivePropertySlim<int> ChapterCount { get; }
+        public ReadOnlyReactivePropertySlim<string> BookmarkedDate { get; }
+        public ReadOnlyReactivePropertySlim<bool> Updating { get; }
+        public AsyncReactiveCommand UpdateCommand { get; }
         public AsyncReactiveCommand ReadCommand { get; }
     }
 
